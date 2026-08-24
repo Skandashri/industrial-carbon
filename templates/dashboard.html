@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Dashboard</title>
+
+<link rel="stylesheet"
+href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+<body>
+
+<nav>
+
+<h2>Industrial Carbon Forecasting</h2>
+
+<ul>
+
+<li><a href="/">Home</a></li>
+
+<li><a href="/predict">Predict</a></li>
+
+<li><a href="/history">History</a></li>
+
+<li><a href="/dashboard">Dashboard</a></li>
+
+<li><a href="/about">About</a></li>
+
+</ul>
+
+</nav>
+
+<div class="container">
+
+<h1>Industrial Dashboard</h1>
+
+<div class="summary-card">
+
+<h2>Total Predictions</h2>
+
+<h1>{{ total }}</h1>
+
+</div>
+
+<div class="graph-grid">
+
+<div class="graph-card">
+
+<h3>Prediction vs Actual</h3>
+
+<img src="{{ url_for('static', filename='graphs/prediction_vs_actual.png') }}">
+
+</div>
+
+<div class="graph-card">
+
+<h3>Residual Plot</h3>
+
+<img src="{{ url_for('static', filename='graphs/residual_plot.png') }}">
+
+</div>
+
+<div class="graph-card">
+
+<h3>Feature Importance</h3>
+
+<img src="{{ url_for('static', filename='graphs/feature_importance.png') }}">
+
+</div>
+
+<div class="graph-card">
+
+<h3>Correlation Heatmap</h3>
+
+<img src="{{ url_for('static', filename='graphs/correlation_heatmap.png') }}">
+
+</div>
+
+</div>
+
+</div>
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+
+</html>

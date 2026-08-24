@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>Predict CO₂</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+<body>
+
+<h1>Industrial CO₂ Prediction</h1>
+
+<form action="/predict_result" method="POST">
+
+    <label>Energy Consumption (kWh)</label>
+
+    <input type="number"
+           name="energy"
+           step="0.01"
+           required>
+
+    <label>Temperature (°C)</label>
+
+    <input type="number"
+           name="temperature"
+           step="0.01"
+           required>
+
+    <label>Humidity (%)</label>
+
+    <input type="number"
+           name="humidity"
+           step="0.01"
+           required>
+
+    <label>Production Output</label>
+
+    <input type="number"
+           name="production"
+           step="0.01"
+           required>
+
+    <label>Working Hour</label>
+
+    <input type="number"
+           name="hour"
+           min="0"
+           max="23"
+           required>
+
+    <label>Weekend</label>
+
+    <select name="weekend">
+
+        <option value="0">Weekday</option>
+
+        <option value="1">Weekend</option>
+
+    </select>
+
+    <br><br>
+
+    <button type="submit">
+
+        Predict CO₂
+
+    </button>
+
+</form>
+
+{% if prediction %}
+
+<h2>
+
+Predicted CO₂ Emission
+
+</h2>
+
+<h1>
+
+{{ prediction }} kg
+
+</h1>
+
+{% endif %}
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

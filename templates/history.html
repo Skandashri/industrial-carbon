@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Prediction History</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+<body>
+
+<nav>
+
+    <h2>Industrial Carbon Forecasting</h2>
+
+    <ul>
+
+        <li><a href="/">Home</a></li>
+
+        <li><a href="/predict">Predict</a></li>
+
+        <li><a href="/history">History</a></li>
+
+        <li><a href="/dashboard">Dashboard</a></li>
+
+        <li><a href="/about">About</a></li>
+
+    </ul>
+
+</nav>
+
+<div class="container">
+
+<h1>Prediction History</h1>
+
+<table>
+
+    <thead>
+
+        <tr>
+
+            <th>ID</th>
+
+            <th>Energy</th>
+
+            <th>Temperature</th>
+
+            <th>Humidity</th>
+
+            <th>Production</th>
+
+            <th>Hour</th>
+
+            <th>Weekend</th>
+
+            <th>Predicted CO₂</th>
+
+            <th>Time</th>
+
+        </tr>
+
+    </thead>
+
+    <tbody>
+
+    {% for row in rows %}
+
+    <tr>
+
+        <td>{{ row.id }}</td>
+
+        <td>{{ row.energy_consumption }}</td>
+
+        <td>{{ row.temperature }}</td>
+
+        <td>{{ row.humidity }}</td>
+
+        <td>{{ row.production_output }}</td>
+
+        <td>{{ row.working_hour }}</td>
+
+        <td>{{ row.weekend }}</td>
+
+        <td>{{ row.predicted_co2 }}</td>
+
+        <td>{{ row.prediction_time }}</td>
+
+    </tr>
+
+    {% endfor %}
+
+    </tbody>
+
+</table>
+
+</div>
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+
+</html>

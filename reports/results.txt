@@ -1,0 +1,7 @@
+MODEL EVALUATION RESULTS
+=========================
+
+MAE  : 0.0099
+MSE  : 0.0012
+RMSE : 0.0342
+R² Score : 0.9998

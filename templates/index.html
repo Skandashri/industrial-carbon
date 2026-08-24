@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Industrial Carbon Emission Forecasting</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<nav>
+
+    <h2>Industrial Carbon Forecasting</h2>
+
+    <ul>
+
+        <li><a href="/">Home</a></li>
+
+        <li><a href="/predict">Predict</a></li>
+
+        <li><a href="/history">History</a></li>
+
+        <li><a href="/dashboard">Dashboard</a></li>
+
+        <li><a href="/about">About</a></li>
+
+    </ul>
+
+</nav>
+
+<div class="hero">
+
+    <h1>AI-Driven Industrial Carbon Emission Forecasting</h1>
+
+    <p>
+        Predict industrial CO₂ emissions using Artificial Intelligence,
+        Machine Learning, and IoT data.
+    </p>
+
+    <a href="/predict" class="btn">
+        Start Prediction
+    </a>
+
+</div>
+
+<div class="features">
+
+    <div class="card">
+        <h3>Machine Learning</h3>
+        <p>Random Forest Regressor predicts CO₂ emissions accurately.</p>
+    </div>
+
+    <div class="card">
+        <h3>IoT Ready</h3>
+        <p>Supports real-time industrial sensor integration.</p>
+    </div>
+
+    <div class="card">
+        <h3>Analytics</h3>
+        <p>Interactive dashboard with graphs and prediction history.</p>
+    </div>
+
+</div>
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
