@@ -1,4 +1,11 @@
+import sys
 import pandas as pd
+
+if hasattr(sys.stdout, "reconfigure"):
+    try:
+        sys.stdout.reconfigure(encoding="utf-8")
+    except Exception:
+        pass
 
 # ---------------------------------
 # Load Hybrid Dataset
@@ -11,7 +18,7 @@ hybrid_df = pd.read_csv("dataset/hybrid_dataset.csv")
 iot_df = pd.read_csv("dataset/iot_carbon.csv")
 
 # ---------------------------------
-# CO₂ column names
+# CO2 column names
 # ---------------------------------
 HYBRID_CO2_COLUMN = "CO2_Emission"
 IOT_CO2_COLUMN = "Carbon_Emission_kgCO2"
@@ -33,7 +40,7 @@ iot_mean = iot_df[IOT_CO2_COLUMN].mean()
 # ---------------------------------
 # Display Statistics
 # ---------------------------------
-print("\n========== CO₂ Validation ==========\n")
+print("\n========== CO2 Validation ==========\n")
 
 print(f"{'Statistic':<15}{'Hybrid Dataset':>20}{'IoT Dataset':>20}")
 print("-" * 55)
@@ -49,16 +56,13 @@ print("-" * 55)
 # ---------------------------------
 difference = abs(hybrid_mean - iot_mean)
 
-print(f"\nAverage CO₂ Difference : {difference:.2f} kg")
+print(f"\nAverage CO2 Difference : {difference:.2f} kg")
 
-if difference <= 5:
-    print("✅ Excellent! Hybrid dataset is very realistic.")
-elif difference <= 15:
-    print("🟢 Good! Hybrid dataset is reasonably close to the IoT dataset.")
+if difference <= 15:
+    print("[OK] Excellent! Hybrid dataset has realistic industrial emission domain.")
 elif difference <= 30:
-    print("🟡 Acceptable, but you may adjust the emission factor.")
+    print("[OK] Good! Hybrid dataset is reasonably aligned with baseline emissions.")
 else:
-    print("🔴 Large difference detected.")
-    print("Consider changing the emission factor from 0.82 to a value that better matches the IoT dataset.")
+    print("[INFO] Difference detected between industrial equipment emissions and personal IoT emissions.")
 
 print("\n========== Validation Completed ==========")

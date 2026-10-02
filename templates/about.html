@@ -2,139 +2,245 @@
 <html lang="en">
 
 <head>
-
-<meta charset="UTF-8">
-
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>About</title>
-
-<link rel="stylesheet"
-href="{{ url_for('static', filename='style.css') }}">
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About | Industrial Carbon Emission Forecasting System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 
 <body>
 
+<!-- =========================================================
+     NAVIGATION
+========================================================= -->
 <nav>
+    <div class="nav-container">
+        <a href="{{ url_for('home') }}" class="nav-brand">
+            <div class="brand-icon-box">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2v8"></path>
+                    <path d="m4.93 10.93 1.41 1.41"></path>
+                    <path d="M2 18h2"></path>
+                    <path d="M20 18h2"></path>
+                    <path d="m19.07 10.93-1.41 1.41"></path>
+                    <path d="M22 22H2"></path>
+                    <path d="m8 22 4-10 4 10"></path>
+                </svg>
+            </div>
+            <div class="brand-text-group">
+                <span class="brand-title">Industrial Carbon</span>
+                <span class="brand-badge">Forecasting System</span>
+            </div>
+        </a>
 
-<h2>Industrial Carbon Forecasting</h2>
+        <button class="mobile-nav-toggle" aria-label="Toggle navigation menu" aria-expanded="false">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+        </button>
 
-<ul>
-
-<li><a href="/">Home</a></li>
-
-<li><a href="/predict">Predict</a></li>
-
-<li><a href="/history">History</a></li>
-
-<li><a href="/dashboard">Dashboard</a></li>
-
-<li><a href="/about">About</a></li>
-
-</ul>
-
+        <ul>
+            <li><a href="{{ url_for('home') }}">Home</a></li>
+            <li><a href="{{ url_for('predict') }}">Predict</a></li>
+            <li><a href="{{ url_for('history') }}">History</a></li>
+            <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+            <li><a href="{{ url_for('about') }}" class="active">About</a></li>
+        </ul>
+    </div>
 </nav>
 
+<!-- =========================================================
+     MAIN CONTENT
+========================================================= -->
 <div class="container">
 
-<h1>About This Project</h1>
+    <div class="page-header">
+        <span class="page-badge">Project Documentation & Architecture</span>
+        <h1>About the System</h1>
+        <p class="subtitle">
+            Real-time IoT Telemetry & AI-Driven Industrial Carbon Emission Forecasting using ESP32, Scikit-Learn Machine Learning, and Scope 2 Grid Emission Standards.
+        </p>
+    </div>
 
-<div class="card">
+    <!-- Overview Card (Full Width) -->
+    <div class="card" style="margin-bottom: 2rem;">
+        <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+            </svg>
+        </div>
+        <h2>Project Overview & Objective</h2>
+        <p style="margin-bottom: 1rem;">
+            Manufacturing and heavy processing facilities contribute significantly to global carbon footprints through intensive electrical consumption. This project delivers an automated, edge-connected decision support system that calculates real-time carbon emissions and forecasts future emission loads based exclusively on core operational parameters.
+        </p>
+        <p>
+            By focusing strictly on <strong>Energy Consumption</strong>, <strong>Production Count</strong>, and <strong>Machine Operating Hours</strong>, the system avoids extraneous ambient noise and delivers accurate, actionable insights for factory managers and energy auditors.
+        </p>
+    </div>
 
-<h2>Project Title</h2>
+    <!-- 2-Column Grid: ML Methodology & Tech Stack -->
+    <div class="about-grid">
 
-<p>
+        <!-- Machine Learning Architecture -->
+        <div class="card">
+            <div class="card-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                </svg>
+            </div>
+            <h2>Machine Learning Methodology</h2>
+            <p style="margin-bottom: 1rem;">
+                The analytical engine leverages an ensemble <strong>Random Forest Regressor</strong> trained on historical industrial records:
+            </p>
+            <ul style="list-style: none; padding: 0; display: flex; flex-direction: column; gap: 0.6rem; font-size: 0.925rem; color: var(--slate-700);">
+                <li style="display: flex; gap: 0.5rem; align-items: flex-start;">
+                    <span style="color: var(--primary-600); font-weight: bold;">•</span>
+                    <span><strong>Core Features:</strong> Energy Consumption (kWh), Production Output (Units), Shift Working Hour (0–23), and Weekend Schedule.</span>
+                </li>
+                <li style="display: flex; gap: 0.5rem; align-items: flex-start;">
+                    <span style="color: var(--primary-600); font-weight: bold;">•</span>
+                    <span><strong>Feature Normalization:</strong> Input vectors scaled via Scikit-Learn's <code style="font-family: var(--font-mono); background: var(--slate-100); padding: 2px 6px; border-radius: 4px;">StandardScaler</code>.</span>
+                </li>
+                <li style="display: flex; gap: 0.5rem; align-items: flex-start;">
+                    <span style="color: var(--primary-600); font-weight: bold;">•</span>
+                    <span><strong>Operating Range:</strong> Trained domain: <strong>6.48 to 19.79 kWh</strong>. Outside this range, the system applies the CEA baseline constant of <strong>0.82 kg CO₂/kWh</strong>.</span>
+                </li>
+            </ul>
+        </div>
 
-AI-Driven Industrial Carbon Emission Forecasting using
-Machine Learning and IoT.
+        <!-- IoT Hardware & Architecture -->
+        <div class="card">
+            <div class="card-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect>
+                    <rect x="9" y="9" width="6" height="6"></rect>
+                    <line x1="9" y1="1" x2="9" y2="4"></line>
+                    <line x1="15" y1="1" x2="15" y2="4"></line>
+                    <line x1="9" y1="20" x2="9" y2="23"></line>
+                    <line x1="15" y1="20" x2="15" y2="23"></line>
+                    <line x1="20" y1="9" x2="23" y2="9"></line>
+                    <line x1="20" y1="14" x2="23" y2="14"></line>
+                    <line x1="1" y1="9" x2="4" y2="9"></line>
+                    <line x1="1" y1="14" x2="4" y2="14"></line>
+                </svg>
+            </div>
+            <h2>IoT Hardware Architecture</h2>
+            <p style="margin-bottom: 0.75rem;">
+                Physical data acquisition architecture designed for factory floor integration:
+            </p>
+            <ul style="list-style: none; padding: 0; display: flex; flex-direction: column; gap: 0.6rem; font-size: 0.925rem; color: var(--slate-700);">
+                <li style="display: flex; gap: 0.5rem; align-items: flex-start;">
+                    <span style="color: var(--primary-600); font-weight: bold;">•</span>
+                    <span><strong>Energy Meter:</strong> PZEM-004T AC multifunction energy module with split-core current transformer via TTL UART.</span>
+                </li>
+                <li style="display: flex; gap: 0.5rem; align-items: flex-start;">
+                    <span style="color: var(--primary-600); font-weight: bold;">•</span>
+                    <span><strong>Production Counter:</strong> E18-D80NK infrared optical proximity sensor triggering GPIO interrupt pulses.</span>
+                </li>
+                <li style="display: flex; gap: 0.5rem; align-items: flex-start;">
+                    <span style="color: var(--primary-600); font-weight: bold;">•</span>
+                    <span><strong>Operating Hours:</strong> Derived dynamically from PZEM-004T active electrical readings (no extra sensor required).</span>
+                </li>
+                <li style="display: flex; gap: 0.5rem; align-items: flex-start;">
+                    <span style="color: var(--primary-600); font-weight: bold;">•</span>
+                    <span><strong>Edge Controller:</strong> ESP32 Wi-Fi microcontroller transmitting JSON telemetry to Flask REST API.</span>
+                </li>
+            </ul>
+        </div>
 
-</p>
+    </div>
+
+    <!-- Future Scope (Full Width) -->
+    <div class="card" style="margin-top: 2rem;">
+        <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M5 12.55a11 11 0 0 1 14.08 0"></path>
+                <path d="M1.42 9a16 16 0 0 1 21.16 0"></path>
+                <path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path>
+                <line x1="12" y1="20" x2="12.01" y2="20"></line>
+            </svg>
+        </div>
+        <h2>Industry 4.0 Deployment Roadmap</h2>
+        <p style="margin-bottom: 1.25rem;">
+            Key scalability milestones for multi-facility enterprise deployments:
+        </p>
+
+        <ul class="roadmap-list">
+            <li class="roadmap-item">
+                <div class="roadmap-bullet">01</div>
+                <div class="roadmap-text">
+                    <h4>Multi-Machine ESP32 Sensor Grid</h4>
+                    <p>Deploying dedicated ESP32 edge nodes across every production line with synchronized factory telemetry.</p>
+                </div>
+            </li>
+
+            <li class="roadmap-item">
+                <div class="roadmap-bullet">02</div>
+                <div class="roadmap-text">
+                    <h4>MQTT Broker Telemetry Streaming</h4>
+                    <p>Scaling ingestion with Eclipse Mosquitto MQTT for lightweight, low-latency industrial publish-subscribe streams.</p>
+                </div>
+            </li>
+
+            <li class="roadmap-item">
+                <div class="roadmap-bullet">03</div>
+                <div class="roadmap-text">
+                    <h4>Automated Severity Threshold Alerts</h4>
+                    <p>Instant webhook and SMS notifications dispatched to plant supervisors whenever forecasted emissions cross the High severity tier.</p>
+                </div>
+            </li>
+
+            <li class="roadmap-item">
+                <div class="roadmap-bullet">04</div>
+                <div class="roadmap-text">
+                    <h4>Deep Learning Temporal Forecasting</h4>
+                    <p>Incorporation of Long Short-Term Memory (LSTM) networks for multi-day ahead carbon budgeting and peak shaving.</p>
+                </div>
+            </li>
+
+            <li class="roadmap-item">
+                <div class="roadmap-bullet">05</div>
+                <div class="roadmap-text">
+                    <h4>Carbon Credit & Regulatory ESG Auditing</h4>
+                    <p>Automated ISO 14064 compliance tracking with carbon credit offset ledger for corporate sustainability reporting.</p>
+                </div>
+            </li>
+        </ul>
+    </div>
 
 </div>
 
-<div class="card">
-
-<h2>Objective</h2>
-
-<p>
-
-This project predicts industrial CO₂ emissions based on
-energy consumption, temperature, humidity,
-production output and operating conditions.
-
-</p>
-
-</div>
-
-<div class="card">
-
-<h2>Technologies Used</h2>
-
-<ul>
-
-<li>Python</li>
-
-<li>Flask</li>
-
-<li>Machine Learning</li>
-
-<li>Random Forest Regressor</li>
-
-<li>MySQL</li>
-
-<li>Pandas</li>
-
-<li>NumPy</li>
-
-<li>Scikit-learn</li>
-
-<li>HTML</li>
-
-<li>CSS</li>
-
-</ul>
-
-</div>
-
-<div class="card">
-
-<h2>Machine Learning Model</h2>
-
-<p>
-
-Random Forest Regressor was trained using the hybrid
-industrial dataset to forecast CO₂ emissions with
-high accuracy.
-
-</p>
-
-</div>
-
-<div class="card">
-
-<h2>Future Scope</h2>
-
-<ul>
-
-<li>Real-time IoT integration</li>
-
-<li>ESP32-based monitoring</li>
-
-<li>Cloud dashboard</li>
-
-<li>Live carbon emission tracking</li>
-
-<li>Automatic alerts</li>
-
-</ul>
-
-</div>
-
-</div>
+<!-- =========================================================
+     FOOTER
+========================================================= -->
+<footer>
+    <div class="footer-container">
+        <div class="footer-brand">
+            <h3>Industrial Carbon Emission Forecasting</h3>
+            <p>AI-driven predictive analytics for sustainable manufacturing & energy management.</p>
+        </div>
+        <div class="footer-nav">
+            <a href="{{ url_for('home') }}">Home</a>
+            <a href="{{ url_for('predict') }}">Predict</a>
+            <a href="{{ url_for('history') }}">History</a>
+            <a href="{{ url_for('dashboard') }}">Dashboard</a>
+            <a href="{{ url_for('about') }}">About</a>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <span>© 2026 Industrial Carbon Forecasting • Real-Time IoT & ML Architecture</span>
+        <span class="system-status-indicator">
+            <span class="status-pulse-dot"></span>
+            ESP32 Ingestion Active • Grid Baseline: 0.82 kg CO₂/kWh
+        </span>
+    </div>
+</footer>
 
 <script src="{{ url_for('static', filename='script.js') }}"></script>
 
 </body>
-
 </html>

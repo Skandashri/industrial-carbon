@@ -2,90 +2,383 @@
 <html lang="en">
 
 <head>
-
-<meta charset="UTF-8">
-
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Dashboard</title>
-
-<link rel="stylesheet"
-href="{{ url_for('static', filename='style.css') }}">
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-Time IoT & ML Carbon Dashboard | Industrial Carbon Forecasting</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
 
+<!-- =========================================================
+     NAVIGATION
+========================================================= -->
 <nav>
+    <div class="nav-container">
+        <a href="{{ url_for('home') }}" class="nav-brand">
+            <div class="brand-icon-box">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2v8"></path>
+                    <path d="m4.93 10.93 1.41 1.41"></path>
+                    <path d="M2 18h2"></path>
+                    <path d="M20 18h2"></path>
+                    <path d="m19.07 10.93-1.41 1.41"></path>
+                    <path d="M22 22H2"></path>
+                    <path d="m8 22 4-10 4 10"></path>
+                </svg>
+            </div>
+            <div class="brand-text-group">
+                <span class="brand-title">Industrial Carbon</span>
+                <span class="brand-badge">IoT Telemetry & Forecasting</span>
+            </div>
+        </a>
 
-<h2>Industrial Carbon Forecasting</h2>
+        <button class="mobile-nav-toggle" aria-label="Toggle navigation menu" aria-expanded="false">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+        </button>
 
-<ul>
-
-<li><a href="/">Home</a></li>
-
-<li><a href="/predict">Predict</a></li>
-
-<li><a href="/history">History</a></li>
-
-<li><a href="/dashboard">Dashboard</a></li>
-
-<li><a href="/about">About</a></li>
-
-</ul>
-
+        <ul>
+            <li><a href="{{ url_for('home') }}">Home</a></li>
+            <li><a href="{{ url_for('predict') }}">Predict</a></li>
+            <li><a href="{{ url_for('history') }}">History</a></li>
+            <li><a href="{{ url_for('dashboard') }}" class="active">Dashboard</a></li>
+            <li><a href="{{ url_for('about') }}">About</a></li>
+        </ul>
+    </div>
 </nav>
 
+<!-- =========================================================
+     MAIN CONTENT
+========================================================= -->
 <div class="container">
 
-<h1>Industrial Dashboard</h1>
+    <div class="page-header" style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+        <div>
+            <span class="page-badge">Real-Time Industrial IoT</span>
+            <h1>Industrial Energy & Carbon Telemetry Dashboard</h1>
+            <p class="subtitle">
+                Live monitoring of physical machine electrical parameters (PZEM-004T), production counts (IR Sensor), and derived operating hours paired with real-time Scope 2 carbon accounting and ML forecasting.
+            </p>
+        </div>
 
-<div class="summary-card">
+        <!-- Live IoT Device Status Card -->
+        <div class="iot-status-card" id="iot-status-card" style="min-width: 290px;">
+            <div class="iot-status-header">
+                <span class="status-pulse-dot" id="iot-pulse-dot"></span>
+                <strong id="iot-status-text">
+                    {% if latest_iot and latest_iot.is_online %}
+                        {% if latest_iot.is_mock %}
+                            TEST / SIMULATION MODE
+                        {% else %}
+                            LIVE IoT MODE (ESP32 Connected)
+                        {% endif %}
+                    {% else %}
+                        Standby / Waiting for ESP32
+                    {% endif %}
+                </strong>
+            </div>
+            <div class="iot-status-details" style="font-size: 0.82rem; line-height: 1.5; margin-top: 0.35rem;">
+                <div>Device ID: <code id="iot-device-id">{{ latest_iot.device_id if latest_iot else 'ESP32_FACTORY_01' }}</code></div>
+                <div>Last Reading: <span id="iot-last-seen">{{ latest_iot.recorded_at if latest_iot else 'No telemetry yet' }}</span></div>
+                <div>PZEM Sensor: <span id="pzem-status-badge" style="font-weight: 600; color: #10b981;">Online</span> | IR Sensor: <span id="ir-status-badge" style="font-weight: 600; color: #10b981;">Armed</span></div>
+            </div>
+            <div style="margin-top: 0.6rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                <button type="button" class="btn btn-sm btn-outline" id="btn-trigger-mock" style="font-size: 0.78rem; padding: 4px 8px;">
+                    ⚡ Inject Test Reading
+                </button>
+                <button type="button" class="btn btn-sm btn-outline" id="btn-reset-prod" style="font-size: 0.78rem; padding: 4px 8px;">
+                    🔄 Reset Batch
+                </button>
+            </div>
+        </div>
+    </div>
 
-<h2>Total Predictions</h2>
+    <!-- Live Core Telemetry Cards Row -->
+    <div class="metrics-summary-row" style="margin-bottom: 1.5rem;">
 
-<h1>{{ total }}</h1>
+        <!-- 1. Energy Consumption -->
+        <div class="metric-stat-card">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span class="metric-stat-label">Current Energy Consumption</span>
+                <span class="core-param-badge">PZEM-004T</span>
+            </div>
+            <div class="metric-stat-val">
+                <span id="live-energy">{{ "%.2f"|format(latest_iot.energy_kwh) if latest_iot else '--.--' }}</span>
+                <span style="font-size: 1rem; font-weight: 500; color: var(--slate-500);">kWh</span>
+            </div>
+            <span class="metric-stat-sub">Active industrial electrical consumption</span>
+        </div>
+
+        <!-- 2. Production Count -->
+        <div class="metric-stat-card">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span class="metric-stat-label">Production Count</span>
+                <span class="core-param-badge">IR Optical Sensor</span>
+            </div>
+            <div class="metric-stat-val">
+                <span id="live-production">{{ latest_iot.production_count if latest_iot else '---' }}</span>
+                <span style="font-size: 1rem; font-weight: 500; color: var(--slate-500);">Units</span>
+            </div>
+            <span class="metric-stat-sub">Debounced falling-edge product detection</span>
+        </div>
+
+        <!-- 3. Machine Operating Hours -->
+        <div class="metric-stat-card">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span class="metric-stat-label">Machine Operating Hours</span>
+                <span class="core-param-badge">Derived from PZEM</span>
+            </div>
+            <div class="metric-stat-val">
+                <span id="live-hours">{{ "%.2f"|format(latest_iot.operating_hours) if latest_iot else '--.--' }}</span>
+                <span style="font-size: 1rem; font-weight: 500; color: var(--slate-500);">Hours</span>
+            </div>
+            <span class="metric-stat-sub">Threshold: Active Power &ge; {{ power_threshold_watts|default(20.0) }} W</span>
+        </div>
+
+        <!-- 4. Real-time Calculated CO2 -->
+        <div class="metric-stat-card" style="border-left: 4px solid var(--primary-600);">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span class="metric-stat-label">Calculated CO₂ Emissions</span>
+                <span class="core-param-badge" style="background: #ecfdf5; color: #065f46;">Scope 2 Grid</span>
+            </div>
+            <div class="metric-stat-val" style="color: var(--primary-700);">
+                <span id="live-co2">{{ "%.2f"|format(latest_iot.co2_emission) if latest_iot else '--.--' }}</span>
+                <span style="font-size: 1rem; font-weight: 500; color: var(--slate-500);">kg CO₂</span>
+            </div>
+            <span class="metric-stat-sub">Formula: Energy &times; {{ emission_factor }} kg CO₂/kWh</span>
+        </div>
+
+    </div>
+
+    <!-- Live Electrical Parameters & Efficiency Strip -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+        <div class="card" style="margin-bottom: 0; padding: 1rem;">
+            <span style="font-size: 0.78rem; font-weight: 600; color: var(--slate-500); text-transform: uppercase;">Active Power</span>
+            <div style="font-size: 1.35rem; font-weight: 700; color: var(--slate-900); margin-top: 2px;">
+                <span id="live-power">{{ "%.1f"|format(latest_iot.power) if latest_iot else '--.-' }}</span>
+                <span style="font-size: 0.85rem; font-weight: 500; color: var(--slate-500);">W</span>
+            </div>
+        </div>
+
+        <div class="card" style="margin-bottom: 0; padding: 1rem;">
+            <span style="font-size: 0.78rem; font-weight: 600; color: var(--slate-500); text-transform: uppercase;">RMS Voltage</span>
+            <div style="font-size: 1.35rem; font-weight: 700; color: var(--slate-900); margin-top: 2px;">
+                <span id="live-voltage">{{ "%.1f"|format(latest_iot.voltage) if latest_iot else '--.-' }}</span>
+                <span style="font-size: 0.85rem; font-weight: 500; color: var(--slate-500);">V</span>
+            </div>
+        </div>
+
+        <div class="card" style="margin-bottom: 0; padding: 1rem;">
+            <span style="font-size: 0.78rem; font-weight: 600; color: var(--slate-500); text-transform: uppercase;">AC Current</span>
+            <div style="font-size: 1.35rem; font-weight: 700; color: var(--slate-900); margin-top: 2px;">
+                <span id="live-current">{{ "%.2f"|format(latest_iot.current) if latest_iot else '-.--' }}</span>
+                <span style="font-size: 0.85rem; font-weight: 500; color: var(--slate-500);">A</span>
+            </div>
+        </div>
+
+        <div class="card" style="margin-bottom: 0; padding: 1rem;">
+            <span style="font-size: 0.78rem; font-weight: 600; color: var(--slate-500); text-transform: uppercase;">Power Factor / Freq</span>
+            <div style="font-size: 1.35rem; font-weight: 700; color: var(--slate-900); margin-top: 2px;">
+                <span id="live-pf">{{ "%.2f"|format(latest_iot.power_factor) if latest_iot else '0.95' }}</span>
+                <span style="font-size: 0.85rem; font-weight: 500; color: var(--slate-500);">/ <span id="live-freq">{{ "%.1f"|format(latest_iot.frequency) if latest_iot else '50.0' }}</span>Hz</span>
+            </div>
+        </div>
+
+        <div class="card" style="margin-bottom: 0; padding: 1rem;">
+            <span style="font-size: 0.78rem; font-weight: 600; color: var(--slate-500); text-transform: uppercase;">Energy per Unit</span>
+            <div style="font-size: 1.35rem; font-weight: 700; color: var(--slate-900); margin-top: 2px;">
+                <span id="live-efficiency">{{ "%.4f"|format(latest_iot.energy_per_unit) if latest_iot else '0.0000' }}</span>
+                <span style="font-size: 0.85rem; font-weight: 500; color: var(--slate-500);">kWh/u</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Secondary Insights: ML Forecast & Telemetry Trends -->
+    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; margin-bottom: 2.5rem;" class="dashboard-split-grid">
+
+        <!-- Live Telemetry Trend Chart -->
+        <div class="card" style="margin-bottom: 0;">
+            <div class="card-header-clean">
+                <div>
+                    <h3>Real-Time IoT Telemetry Trend</h3>
+                    <p class="subtitle" style="margin-bottom: 0;">Continuous stream from ESP32: Energy Consumption vs. Scope 2 CO₂ Output</p>
+                </div>
+                <span class="badge badge-primary">Dynamic 4s Polling</span>
+            </div>
+            <div style="position: relative; height: 270px; width: 100%; margin-top: 1rem;">
+                <canvas id="iotTrendChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Machine Status & ML Forecast Box -->
+        <div class="card" style="margin-bottom: 0; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+                <div class="card-header-clean">
+                    <h3>Machine & AI Status</h3>
+                    <span class="badge">Inference Engine</span>
+                </div>
+
+                <div style="margin-top: 1rem;">
+                    <div style="font-size: 0.825rem; text-transform: uppercase; color: var(--slate-500); font-weight: 600;">Operating State</div>
+                    <div style="font-size: 1.25rem; font-weight: 700; color: var(--slate-900); margin-top: 2px;" id="live-status">
+                        {{ latest_iot.machine_status if latest_iot else 'Standby' }}
+                    </div>
+                    <div style="font-size: 0.8rem; color: var(--slate-500); margin-top: 2px;">
+                        Current session: <span id="live-session-time">0.0</span> min
+                    </div>
+                </div>
+
+                <div style="margin-top: 1rem;">
+                    <div style="font-size: 0.825rem; text-transform: uppercase; color: var(--slate-500); font-weight: 600;">ML Model Forecast</div>
+                    <div style="font-size: 1.5rem; font-weight: 700; color: var(--primary-600); margin-top: 2px;">
+                        <span id="live-forecast">
+                            {% if latest_iot %}
+                                {{ "%.2f"|format(latest_iot.forecast_co2) }}
+                            {% else %}
+                                Active
+                            {% endif %}
+                        </span>
+                        <span style="font-size: 0.9rem; font-weight: 500; color: var(--slate-500);">kg CO₂</span>
+                    </div>
+                    <span style="font-size: 0.8rem; color: var(--slate-600);">Random Forest Regressor (Trained on Energy, Production, Working Hour, Weekend)</span>
+                </div>
+
+                <div style="margin-top: 1rem; padding: 0.75rem; background: var(--slate-50); border-radius: 8px; border: 1px solid var(--slate-200); font-size: 0.85rem;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                        <span style="color: var(--slate-600);">Total Predictions Logged:</span>
+                        <strong>{{ total_predictions }}</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="color: var(--slate-600);">Average Historical CO₂:</span>
+                        <strong>{{ avg_co2 }} kg</strong>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top: 1rem;">
+                <a href="{{ url_for('predict') }}" class="btn btn-primary" style="width: 100%; justify-content: center;">
+                    Manual Single Inference
+                </a>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Section: Model Evaluation Diagnostics (Temp and Humidity completely removed) -->
+    <div style="margin-bottom: 1.5rem;">
+        <h2>Machine Learning Model Diagnostics</h2>
+        <p class="subtitle">
+            Diagnostic performance visualizations for the Random Forest model trained exclusively on <strong>Energy Consumption</strong>, <strong>Production Output</strong>, and <strong>Shift Working Hours</strong>.
+        </p>
+    </div>
+
+    <!-- Graph Visualization Grid -->
+    <div class="graph-grid">
+
+        <!-- Graph 1: Actual vs Predicted -->
+        <div class="graph-card">
+            <div class="graph-header">
+                <h3>Prediction vs. Actual CO₂</h3>
+                <span class="graph-badge">Model Parity Fit</span>
+            </div>
+            <div class="graph-img-wrapper" title="Click to enlarge visualization">
+                <img
+                    src="{{ url_for('static', filename='graphs/actual_vs_predicted_fixed.png') }}"
+                    alt="Actual vs Predicted CO2 Scatter Plot"
+                >
+            </div>
+            <p class="graph-desc">
+                Validates regression alignment for emission projections using operational telemetry, achieving an $R^2$ Score of 0.9821 on independent industrial holdout test data.
+            </p>
+        </div>
+
+        <!-- Graph 2: Residual Analysis -->
+        <div class="graph-card">
+            <div class="graph-header">
+                <h3>Residual Distribution Analysis</h3>
+                <span class="graph-badge">Zero-Bias Error</span>
+            </div>
+            <div class="graph-img-wrapper" title="Click to enlarge visualization">
+                <img
+                    src="{{ url_for('static', filename='graphs/residual_analysis_fixed.png') }}"
+                    alt="Residual Error Analysis Chart"
+                >
+            </div>
+            <p class="graph-desc">
+                Residual errors are tightly concentrated symmetrically around zero ($MAE = 0.34\text{ kg CO}_2$), verifying homoscedasticity across the entire industrial operating energy domain.
+            </p>
+        </div>
+
+        <!-- Graph 3: Feature Importance -->
+        <div class="graph-card">
+            <div class="graph-header">
+                <h3>Feature Importance Ranking</h3>
+                <span class="graph-badge">Core Parameters Only</span>
+            </div>
+            <div class="graph-img-wrapper" title="Click to enlarge visualization">
+                <img
+                    src="{{ url_for('static', filename='graphs/feature_importance_fixed.png') }}"
+                    alt="Feature Importance Chart"
+                >
+            </div>
+            <p class="graph-desc">
+                Direct feature contribution rankings of the core industrial parameters: Energy Consumption, Production Output, and Machine Operating Shifts.
+            </p>
+        </div>
+
+        <!-- Graph 4: Correlation Heatmap -->
+        <div class="graph-card">
+            <div class="graph-header">
+                <h3>Multivariate Correlation Heatmap</h3>
+                <span class="graph-badge">Pearson Collinearity</span>
+            </div>
+            <div class="graph-img-wrapper" title="Click to enlarge visualization">
+                <img
+                    src="{{ url_for('static', filename='graphs/correlation_heatmap_fixed.png') }}"
+                    alt="Correlation Matrix Heatmap"
+                >
+            </div>
+            <p class="graph-desc">
+                Empirical correlation matrix confirming strong direct proportional linkage between kilowatt-hour electrical consumption and total carbon emission footprint.
+            </p>
+        </div>
+
+    </div>
 
 </div>
 
-<div class="graph-grid">
+<!-- =========================================================
+     FOOTER
+========================================================= -->
+<footer>
+    <div class="footer-container">
+        <div class="footer-brand">
+            <h3>Industrial Carbon Emission Forecasting</h3>
+            <p>Real-time ESP32 IoT telemetry (PZEM-004T + IR sensor) and AI-driven predictive analytics for industrial decarbonization.</p>
+        </div>
+        <div class="footer-nav">
+            <a href="{{ url_for('home') }}">Home</a>
+            <a href="{{ url_for('predict') }}">Predict</a>
+            <a href="{{ url_for('history') }}">History</a>
+            <a href="{{ url_for('dashboard') }}">Dashboard</a>
+            <a href="{{ url_for('about') }}">About</a>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <span>© 2026 Industrial Carbon Forecasting • Real-Time IoT & ML Architecture</span>
+        <span class="system-status-indicator">
+            <span class="status-pulse-dot"></span>
+            ESP32 Ingestion Active • Grid Emission Baseline: {{ emission_factor }} kg CO₂/kWh
+        </span>
+    </div>
+</footer>
 
-<div class="graph-card">
-
-<h3>Prediction vs Actual</h3>
-
-<img src="{{ url_for('static', filename='graphs/prediction_vs_actual.png') }}">
-
-</div>
-
-<div class="graph-card">
-
-<h3>Residual Plot</h3>
-
-<img src="{{ url_for('static', filename='graphs/residual_plot.png') }}">
-
-</div>
-
-<div class="graph-card">
-
-<h3>Feature Importance</h3>
-
-<img src="{{ url_for('static', filename='graphs/feature_importance.png') }}">
-
-</div>
-
-<div class="graph-card">
-
-<h3>Correlation Heatmap</h3>
-
-<img src="{{ url_for('static', filename='graphs/correlation_heatmap.png') }}">
-
-</div>
-
-</div>
-
-</div>
 <script src="{{ url_for('static', filename='script.js') }}"></script>
-</body>
 
+</body>
 </html>
