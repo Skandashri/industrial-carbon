@@ -90,7 +90,27 @@ def run_tests():
         "weekend": "0"
     }
     res = client.post("/predict_result", data=pred_payload, follow_redirects=True)
-    assert_test(res.status_code == 200 and b"Emission Analysis Result" in res.data, "POST /predict_result (Core parameters only: Energy, Production, Hour, Weekend)")
+    assert_test(res.status_code == 200 and b"Emission Analysis Result" in res.data, "POST /predict_result (Core parameters: Energy=14.20 kWh)")
+
+    # 4b. Low Energy Prediction (1.0 kWh, within new 0.22 - 19.79 kWh AI domain)
+    low_pred_payload = {
+        "energy": "1.00",
+        "production": "15",
+        "hour": "11",
+        "weekend": "0"
+    }
+    res_low = client.post("/predict_result", data=low_pred_payload, follow_redirects=True)
+    assert_test(res_low.status_code == 200 and b"Random Forest Machine Learning Model" in res_low.data, "POST /predict_result (Low energy: 1.00 kWh processed via AI model)")
+
+    # 4c. Out of Range Protection Warning (0.10 kWh < 0.22 kWh minimum)
+    oor_payload = {
+        "energy": "0.10",
+        "production": "0",
+        "hour": "8",
+        "weekend": "0"
+    }
+    res_oor = client.post("/predict_result", data=oor_payload, follow_redirects=True)
+    assert_test(res_oor.status_code == 200 and b"validated training range" in res_oor.data, "POST /predict_result (Out-of-range protection: 0.10 kWh triggers warning notice)")
 
     # 5. History Route
     res = client.get("/history")

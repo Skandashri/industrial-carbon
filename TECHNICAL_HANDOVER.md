@@ -58,7 +58,7 @@ The **Industrial Carbon Emission Forecasting System** is an automated, edge-conn
   1. *Manual Web Form Inference (`POST /predict_result`):* Allows an operator to manually input Energy (kWh), Production Output (Units), Working Hour (0–23), and Weekend Schedule (0/1).
   2. *Automated IoT Telemetry Ingestion (`POST /api/iot/telemetry`):* Ingests JSON packets containing electrical telemetry (Voltage, Current, Active Power, Cumulative Energy, Frequency, Power Factor) and IR sensor production counts.
 * **Automated Operational State & Working Hours Derivation:** Derives machine status (`Running` vs `Idle`) using an active electrical power threshold ($P \ge 20.0\text{ W}$) and current threshold ($I \ge 0.15\text{ A}$), automatically accumulating operating session runtime without requiring any dedicated external timer or secondary runtime sensor.
-* **Dual Carbon Quantification:** Calculates baseline Scope 2 grid emissions ($\text{kWh} \times 0.82\text{ kg CO}_2/\text{kWh}$) and executes Random Forest AI inference whenever energy is within the model's domain ($6.48 \le \text{Energy} \le 19.79\text{ kWh}$).
+* **Dual Carbon Quantification:** Calculates baseline Scope 2 grid emissions ($\text{kWh} \times 0.82\text{ kg CO}_2/\text{kWh}$) and executes Random Forest AI inference whenever energy is within the model's domain ($0.22 \le \text{Energy} \le 19.79\text{ kWh}$).
 * **Database Logging & PDF Auditing:** Persists every manual prediction to `prediction_history`, logs all IoT telemetry to `iot_telemetry` in MySQL, and dynamically compiles formal ISO-style PDF certification audit reports via ReportLab (`/download-pdf/<id>`).
 
 ### What the Final Intended System Should Do
@@ -98,9 +98,10 @@ The physical ESP32, connected to the factory electrical panel via PZEM-004T and 
 IndustrialCarbonForecasting/
 │
 ├── dataset/                                   # Data storage directory
-│   ├── hybrid_dataset.csv                     # Final 1,200-row dataset used to train Random Forest
+│   ├── hybrid_dataset.csv                     # Final 1,800-row expanded dataset used to train Random Forest
 │   ├── industrial_energy.csv                  # Raw historical manufacturing equipment dataset
 │   ├── industrial_energy_cleaned.csv          # Intermediate cleaned dataset (missing values handled)
+│   ├── industrial_energy_expanded_low_energy.csv # Expanded dataset with low-energy samples (0.22 - 19.79 kWh)
 │   ├── industrial_energy_features.csv         # Engineered features dataset (specific energy, hour, weekend)
 │   └── iot_carbon.csv                         # Reference benchmark dataset used for domain validation
 │
@@ -118,8 +119,8 @@ IndustrialCarbonForecasting/
 │   ├── graphs/                                # High-resolution PNG evaluation figures
 │   │   ├── correlation_heatmap.png            # Multivariate Pearson correlation heatmap
 │   │   ├── feature_importance.png             # Bar chart of Random Forest Gini feature importances
-│   │   ├── prediction_vs_actual.png           # Actual vs Predicted parity scatter plot (R² = 0.9821)
-│   │   └── residual_plot.png                  # Residual error distribution plot (MAE = 0.3402 kg)
+│   │   ├── prediction_vs_actual.png           # Actual vs Predicted parity scatter plot (R² = 0.9869)
+│   │   └── residual_plot.png                  # Residual error distribution plot (MAE = 0.3344 kg)
 │   ├── predictions/                           # Generated PDF certificates (stored by record ID)
 │   │   └── CO2_Prediction_*.pdf               # Individual certification report files
 │   └── results.txt                            # Verified text metrics (MAE, MSE, RMSE, R², MAPE, CV)
@@ -270,7 +271,7 @@ setInterval(updateDashboardTelemetry, 4000);
 * **Scaler:** `sklearn.preprocessing.StandardScaler`
 * **Model Artifact:** `model/random_forest.pkl`
 * **Scaler Artifact:** `model/scaler.pkl`
-* **Training Dataset:** `dataset/hybrid_dataset.csv` (1,200 rows, 20% holdout test)
+* **Training Dataset:** `dataset/hybrid_dataset.csv` (1,800 rows, 20% holdout test)
 
 ### EXACT Feature Names and EXACT Feature Order
 The model expects **strictly 4 features in this exact order**:
@@ -285,22 +286,22 @@ FEATURE_NAMES = [
 * **Target Variable:** `CO2_Emission` (kg CO2).
 
 ### Verified Evaluation Metrics (`reports/results.txt`)
-* **Holdout Test Set:** 240 samples (20.0%)
-* **Coefficient of Determination ($R^2$):** **`0.9821`**
-* **5-Fold Cross-Validation Mean $R^2$:** **`0.9807`** ($\pm 0.0015$)
-* **Mean Absolute Error (MAE):** **`0.3402 kg CO2`**
-* **Root Mean Squared Error (RMSE):** **`0.4304 kg CO2`**
-* **Mean Absolute Percentage Error (MAPE):** **`4.87%`**
+* **Holdout Test Set:** 360 samples (20.0%)
+* **Coefficient of Determination ($R^2$):** **`0.9869`**
+* **5-Fold Cross-Validation Mean $R^2$:** **`0.9816`** ($\pm 0.0021$)
+* **Mean Absolute Error (MAE):** **`0.3344 kg CO2`**
+* **Root Mean Squared Error (RMSE):** **`0.4204 kg CO2`**
+* **Mean Absolute Percentage Error (MAPE):** **`8.05%`**
 
 ### Feature Importance Breakdown
-1. `Energy_Consumption`: **87.66%** ($0.876635$)
-2. `Production_Output`: **6.36%** ($0.063589$)
-3. `Working_Hour`: **3.46%** ($0.034615$)
-4. `Weekend`: **2.52%** ($0.025161$)
+1. `Energy_Consumption`: **91.36%** ($0.913553$)
+2. `Production_Output`: **3.63%** ($0.036280$)
+3. `Working_Hour`: **2.72%** ($0.027245$)
+4. `Weekend`: **2.29%** ($0.022922$)
 
 ### Out-of-Domain Fallback Logic
-* The model's training range is `MODEL_ENERGY_MIN = 6.48 kWh` to `MODEL_ENERGY_MAX = 19.79 kWh`.
-* When input energy is within `[6.48, 19.79]`, the system uses `predict_ml_model()`.
+* The model's training range is `MODEL_ENERGY_MIN = 0.22 kWh` to `MODEL_ENERGY_MAX = 19.79 kWh`.
+* When input energy is within `[0.22, 19.79]`, the system uses `predict_ml_model()`.
 * Outside this range, the system avoids extrapolation bias and falls back to the CEA Scope 2 formula:
   $$\text{CO}_2\ (\text{kg}) = \text{Energy (kWh)} \times 0.82\ \text{kg CO}_2/\text{kWh}$$
 
@@ -323,7 +324,7 @@ FEATURE_NAMES = [
                                ▼
                      DOMAIN RANGE EVALUATION
                    /─────────────────────────\
-                  <  6.48 <= Energy <= 19.79  >
+                  <  0.22 <= Energy <= 19.79  >
                    \─────────────────────────/
                          /             \
                    YES  /               \  NO
@@ -853,8 +854,8 @@ DATABASE:
 
 ML MODEL:
   Supervised RandomForestRegressor (n_estimators=100, max_depth=10, random_state=42).
-  StandardScaler normalization. Metrics: R² = 0.9821, MAE = 0.3402 kg CO2.
-  Domain boundaries: 6.48 to 19.79 kWh. (Falls back to 0.82 kg/kWh outside domain).
+  StandardScaler normalization. Metrics: R² = 0.9869, MAE = 0.3344 kg CO2.
+  Domain boundaries: 0.22 to 19.79 kWh. (Falls back to 0.82 kg/kWh outside domain).
 
 CURRENT INPUTS:
   Feature 1: Energy_Consumption (kWh)

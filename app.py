@@ -55,7 +55,7 @@ def predict_ml_model(energy, production, hour, weekend):
 EMISSION_FACTOR = 0.82
 
 # Model training energy range for interpolation
-MODEL_ENERGY_MIN = 6.48
+MODEL_ENERGY_MIN = 0.22
 MODEL_ENERGY_MAX = 19.79
 
 # Configurable Machine Operating Thresholds (Derived from PZEM-004T)
@@ -183,7 +183,12 @@ def predict_result():
         data = np.array([[energy, production, hour, weekend]], dtype=float)
 
         # Prediction logic
-        if MODEL_ENERGY_MIN <= energy <= MODEL_ENERGY_MAX:
+        is_in_range = (MODEL_ENERGY_MIN <= energy <= MODEL_ENERGY_MAX)
+        range_warning = None
+        if not is_in_range:
+            range_warning = f"Energy value is outside the model's validated training range ({MODEL_ENERGY_MIN:.2f} – {MODEL_ENERGY_MAX:.2f} kWh). Prediction may be less reliable."
+
+        if is_in_range:
             prediction = predict_ml_model(energy, production, hour, weekend)
             prediction_method = "Random Forest Machine Learning Model"
             is_ai_prediction = True
@@ -219,6 +224,7 @@ def predict_result():
             prevention_measures=prevention_measures,
             prediction_id=prediction_id,
             is_ai_prediction=is_ai_prediction,
+            range_warning=range_warning,
             model_energy_min=MODEL_ENERGY_MIN,
             model_energy_max=MODEL_ENERGY_MAX,
             energy=energy,

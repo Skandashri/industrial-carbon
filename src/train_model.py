@@ -53,8 +53,12 @@ X_train, X_test, y_train, y_test = train_test_split(
     test_size=0.20,
     random_state=42
 )
-print(f"\nTrain set size : {len(X_train)} samples")
-print(f"Test set size  : {len(X_test)} samples (Independent test set)")
+print(f"\nTrain set size          : {len(X_train)} samples")
+print(f"Test set size           : {len(X_test)} samples (Independent test set)")
+print(f"Minimum training energy : {X_train['Energy_Consumption'].min():.2f} kWh")
+print(f"Maximum training energy : {X_train['Energy_Consumption'].max():.2f} kWh")
+print(f"Minimum testing energy  : {X_test['Energy_Consumption'].min():.2f} kWh")
+print(f"Maximum testing energy  : {X_test['Energy_Consumption'].max():.2f} kWh")
 
 # ==============================================================================
 # FEATURE SCALING (Fitted strictly on Training set to eliminate data leakage)

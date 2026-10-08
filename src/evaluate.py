@@ -164,7 +164,7 @@ plt.scatter(
     edgecolors="#0f172a",
     linewidths=0.5,
     c="#2563eb",
-    label="Test Observations (N=240)"
+    label=f"Test Observations (N={len(y_test)})"
 )
 min_val = min(y_test.min(), y_pred.min())
 max_val = max(y_test.max(), y_pred.max())

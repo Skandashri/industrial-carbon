@@ -12,10 +12,14 @@ import numpy as np
 # NOTE: Temperature and Humidity are completely eliminated.
 # -------------------------------------------------------------
 
-input_file = "dataset/industrial_energy_cleaned.csv"
+import os
+
+expanded_file = "dataset/industrial_energy_expanded_low_energy.csv"
+default_file = "dataset/industrial_energy_cleaned.csv"
+input_file = expanded_file if os.path.exists(expanded_file) else default_file
 output_file = "dataset/industrial_energy_features.csv"
 
-print(f"Loading cleaned dataset from {input_file}...")
+print(f"Loading dataset from {input_file}...")
 df = pd.read_csv(input_file)
 
 # Ensure obsolete columns are removed

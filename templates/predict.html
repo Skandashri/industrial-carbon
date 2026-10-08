@@ -84,7 +84,7 @@
                 <p>Validated and scaled before Random Forest model inference.</p>
             </div>
             <div class="form-badge-pill">
-                <span>⚡ AI Range: 6.48 – 19.79 kWh</span>
+                <span>⚡ AI Range: 0.22 – 19.79 kWh</span>
             </div>
         </div>
 
@@ -117,7 +117,7 @@
                             <line x1="12" y1="16" x2="12" y2="12"></line>
                             <line x1="12" y1="8" x2="12.01" y2="8"></line>
                         </svg>
-                        Trained AI range: 6.48 – 19.79 kWh (Factor used outside)
+                        Trained AI range: 0.22 – 19.79 kWh (Factor used outside)
                     </span>
                 </div>
 
@@ -262,7 +262,24 @@
         </div>
 
         <!-- Out of Range Info Notice -->
-        {% if not is_ai_prediction %}
+        {% if range_warning %}
+        <div class="info-message" style="border-left: 4px solid var(--warning-500, #f59e0b);">
+            <strong>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+                Energy Value Outside Validated Training Range
+            </strong>
+            <p>
+                {{ range_warning }}
+            </p>
+            <p>
+                To avoid unconstrained machine learning extrapolation errors, the system applied the standardized industrial electricity emission factor of <strong>0.82 kg CO₂/kWh</strong>.
+            </p>
+        </div>
+        {% elif not is_ai_prediction %}
         <div class="info-message">
             <strong>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">

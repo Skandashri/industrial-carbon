@@ -18,7 +18,7 @@ MODEL_PATH = "model/random_forest.pkl"
 SCALER_PATH = "model/scaler.pkl"
 EMISSION_FACTOR = 0.82  # CEA Scope 2 standard (kg CO2/kWh)
 
-MODEL_ENERGY_MIN = 6.48
+MODEL_ENERGY_MIN = 0.22
 MODEL_ENERGY_MAX = 19.79
 
 FEATURE_NAMES = ["Energy_Consumption", "Production_Output", "Working_Hour", "Weekend"]
@@ -39,8 +39,9 @@ def load_inference_pipeline():
 def predict_carbon_emission(energy_kwh, production_output, working_hour=12, weekend=0):
     """
     Computes forecasted CO2 emissions in kg.
-    Uses Random Forest when energy is within training domain [6.48, 19.79],
+    Uses Random Forest when energy is within validated training domain [0.22, 19.79],
     falls back to standard CEA Scope 2 grid emission factor (0.82 kg/kWh) otherwise.
+    Issues a clear warning when input is outside the model's validated training range.
     """
     energy = float(energy_kwh)
     production = float(production_output)
@@ -49,7 +50,15 @@ def predict_carbon_emission(energy_kwh, production_output, working_hour=12, week
 
     model, scaler = load_inference_pipeline()
 
-    if MODEL_ENERGY_MIN <= energy <= MODEL_ENERGY_MAX:
+    is_in_range = (MODEL_ENERGY_MIN <= energy <= MODEL_ENERGY_MAX)
+    warning = None
+    if not is_in_range:
+        warning = (
+            f"Energy value is outside the model's validated training range "
+            f"[{MODEL_ENERGY_MIN:.2f} – {MODEL_ENERGY_MAX:.2f} kWh]. Prediction may be less reliable."
+        )
+
+    if is_in_range:
         df_feat = pd.DataFrame([[energy, production, hour, wknd]], columns=FEATURE_NAMES)
         scaled_feat = scaler.transform(df_feat)
         predicted_co2 = float(model.predict(scaled_feat)[0])
@@ -68,7 +77,9 @@ def predict_carbon_emission(energy_kwh, production_output, working_hour=12, week
         "weekend": wknd,
         "predicted_co2": predicted_co2,
         "method": method,
-        "is_ai": is_ai
+        "is_ai": is_ai,
+        "is_in_range": is_in_range,
+        "warning": warning
     }
 
 if __name__ == "__main__":

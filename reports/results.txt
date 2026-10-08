@@ -2,25 +2,25 @@
 INDUSTRIAL CARBON FORECASTING - MODEL EVALUATION
 ==================================================
 
-Total Records       : 1200
-Holdout Test Set    : 240 samples (20%)
+Total Records       : 1800
+Holdout Test Set    : 360 samples (20%)
 Features Used       : Energy_Consumption, Production_Output, Working_Hour, Weekend
 Target Feature      : CO2_Emission
 
 PERFORMANCE METRICS (INDEPENDENT TEST SET):
-  MAE               : 0.3402 kg CO2
-  MSE               : 0.1852
-  RMSE              : 0.4304 kg CO2
-  R^2 Score          : 0.9821
-  MAPE              : 4.87%
-  5-Fold CV Mean R^2 : 0.9807 (+/- 0.0015)
+  MAE               : 0.3344 kg CO2
+  MSE               : 0.1767
+  RMSE              : 0.4204 kg CO2
+  R^2 Score          : 0.9869
+  MAPE              : 8.05%
+  5-Fold CV Mean R^2 : 0.9816 (+/- 0.0021)
 
 WEEKEND DISTRIBUTION:
-  Weekend=0 : 960 records (80.0%)
-  Weekend=1 : 240 records (20.0%)
+  Weekend=0 : 1368 records (76.0%)
+  Weekend=1 : 432 records (24.0%)
 
 FEATURE IMPORTANCES (RANDOM FOREST):
-  Energy_Consumption    : 0.876635 (87.66%)
-  Production_Output     : 0.063589 (6.36%)
-  Working_Hour          : 0.034615 (3.46%)
-  Weekend               : 0.025161 (2.52%)
+  Energy_Consumption    : 0.913553 (91.36%)
+  Production_Output     : 0.036280 (3.63%)
+  Working_Hour          : 0.027245 (2.72%)
+  Weekend               : 0.022922 (2.29%)
